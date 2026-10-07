@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gabriel Chidindu Jevizu - Birthday Memories</title>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --bg-dark: #090d16;
+            --card-bg: #1e293b;
+            --text-light: #f8fafc;
+            --accent: #818cf8;
+        }
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            margin: 0;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 24px;
+            max-width: 600px;
+        }
+        h1 {
+            color: var(--accent);
+            margin-bottom: 8px;
+            font-size: 1.8rem;
+        }
+        p {
+            color: #94a3b8;
+            font-size: 0.95rem;
+            margin-top: 0;
+        }
+        .container {
+            width: 100%;
+            max-width: 550px;
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+            margin-bottom: 24px;
+            box-sizing: border-box;
+        }
+        label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #cbd5e1;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            margin: 6px 0 16px 0;
+            border: 1px solid #475569;
+            background: #0f172a;
+            color: white;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+        button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px;
+            width: 100%;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        button:active {
+            opacity: 0.8;
+        }
+        .media-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            width: 100%;
+            max-width: 550px;
+        }
+        .media-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            padding: 16px;
+            box-sizing: border-box;
+        }
+        .media-card img, .media-card iframe {
+            width: 100%;
+            border-radius: 10px;
+            max-height: 450px;
+            object-fit: contain;
+            background: black;
+        }
+        .media-card iframe {
+            aspect-ratio: 16 / 9;
+            border: none;
+            height: auto;
+        }
+        .media-card p {
+            margin: 12px 0 8px 0;
+            color: var(--text-light);
+            font-size: 1rem;
+            word-break: break-word;
+        }
+        .author {
+            font-weight: bold;
+            color: var(--accent);
+            font-size: 0.9rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #334155;
+            padding-top: 10px;
+            margin-top: 10px;
+        }
+        .date {
+            font-size: 0.75rem;
+            color: #64748b;
+            font-weight: normal;
+        }
+        .instructions {
+            font-size: 0.8rem;
+            color: #38bdf8;
+            margin-top: -10px;
+            margin-bottom: 14px;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Gabriel Chidindu Jevizu</h1>
+        <p>Celebrating a milestone birthday! Share your high-res photos and heavy video memories below.</p>
+    </header>
+
+    <div class="container">
+        <h2 style="margin-top:0; color:var(--text-light); font-size:1.3rem;">Add Your Memory</h2>
+        <form id="memoryForm">
+            <label for="name">Your Name:</label>
+            <input type="text" id="name" required placeholder="e.g., Chiamaka">
+
+            <label for="mediaType">Type of Memory:</label>
+            <select id="mediaType" onchange="toggleInputFields()">
+                <option value="photo">High-Res Photo (ImgBB Link)</option>
+                <option value="video">Heavy Video (Google Drive Link)</option>
+                <option value="text">Just a Text Message</option>
+            </select>
+
+            <div id="linkContainer">
+                <label for="mediaLink">Media Link:</label>
+                <div class="instructions" id="linkHint">1. Upload your photo to ImgBB.<br>2. Copy the direct image link and paste it here.</div>
+                <input type="url" id="mediaLink" placeholder="https://...">
+            </div>
+
+            <label for="message">Message / Note:</label>
+            <textarea id="message" rows="3" placeholder="Write your birthday wish..."></textarea>
+
+            <button type="submit">Post Memory</button>
+        </form>
+    </div>
+
+    <div class="media-grid" id="feed">
+        <!-- Memories load dynamically here -->
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", loadMemories);
+
+        function toggleInputFields() {
+            const type = document.getElementById("mediaType").value;
+            const linkContainer = document.getElementById("linkContainer");
+            const linkHint = document.getElementById("linkHint");
+            const mediaLink = document.getElementById("mediaLink");
+
+            if (type === "text") {
+                linkContainer.style.display = "none";
+                mediaLink.required = false;
+            } else {
+                linkContainer.style.display = "block";
+                mediaLink.required = true;
+                if (type === "photo") {
+                    linkHint.innerHTML = "1. Upload your photo to ImgBB.<br>2. Copy the direct image link and paste it here.";
+                } else {
+                    linkHint.innerHTML = "1. Upload your 1:30 video to Google Drive (set link access to 'Anyone with link').<br>2. Paste the link here (it will auto-format for playback).";
+                }
+            }
+        }
+
+        document.getElementById("memoryForm").addEventListener("submit", function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById("name").value;
+            const type = document.getElementById("mediaType").value;
+            let link = document.getElementById("mediaLink").value;
+            const message = document.getElementById("message").value;
+
+            // Automatically format Google Drive sharing URLs into embedded preview players
+            if (type === "video" && link.includes("drive.google.com")) {
+                link = link.replace(/\/view\?usp=sharing|\/view.*/, "/preview");
+            }
+
+            const memory = { name, type, link, message, date: new Date().toLocaleDateString() };
+            
+            let memories = JSON.parse(localStorage.getItem("gabrielMemoriesV2") || "[]");
+            memories.unshift(memory);
+            localStorage.setItem("gabrielMemoriesV2", JSON.stringify(memories));
+
+            document.getElementById("memoryForm").reset();
+            toggleInputFields();
+            loadMemories();
+        });
+
+        function loadMemories() {
+            const feed = document.getElementById("feed");
+            const memories = JSON.parse(localStorage.getItem("gabrielMemoriesV2") || "[]");
+            
+            feed.innerHTML = "";
+            memories.forEach(mem => {
+                const card = document.createElement("div");
+                card.className = "media-card";
+
+                let mediaHTML = "";
+                if (mem.type === "photo" && mem.link) {
+                    mediaHTML = `<img src="${mem.link}" alt="Birthday Photo" loading="lazy">`;
+                } else if (mem.type === "video" && mem.link) {
+                    mediaHTML = `<iframe src="${mem.link}" allowfullscreen></iframe>`;
+                }
+
+                let messageHTML = mem.message ? `<p>${mem.message}</p>` : "";
+
+                card.innerHTML = `
+                    ${mediaHTML}
+                    ${messageHTML}
+                    <div class="author">
+                        <span>— ${mem.name}</span>
+                        <span class="date">${mem.date}</span>
+                    </div>
+                `;
+                feed.appendChild(card);
+            });
+        }
+    </script>
+</body>
+</html>
